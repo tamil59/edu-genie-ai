@@ -44,6 +44,11 @@ async def explain(payload: QuestionRequest):
     try:
         return {"result": explain_concept(payload.question)}
     except Exception as exc:
+        if "503" in str(exc) or "UNAVAILABLE" in str(exc).upper():
+            raise HTTPException(
+                status_code=503,
+                detail="The AI service is experiencing high demand. Please try again later.",
+            )
         raise HTTPException(status_code=502, detail=f"Explanation failed: {exc}")
 
 @app.post("/quiz")
